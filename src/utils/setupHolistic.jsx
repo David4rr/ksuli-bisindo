@@ -207,8 +207,8 @@ const setupHolistic = async (
     onFrame: async () => {
       await holistic.send({ image: videoElement });
     },
-    width: window.innerWidth,
-    height: window.innerHeight,
+    width: 1280,
+    height: 720,
   });
 
   await camera.start();
