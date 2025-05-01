@@ -21,7 +21,7 @@ const KosaKatapage = () => {
             <div className="flex flex-col py-4">
                 <h1
                     id="selectedCard"
-                    className="text-lg font-bold text-black pt-2">Kosa Kata</h1>
+                    className="text-lg font-bold text-black pt-2 lg:pt-10">Kosa Kata</h1>
                 <p className="text-black">
                     Halaman ini berisi kosa kata yang digunakan untuk deteksi
                 </p>
