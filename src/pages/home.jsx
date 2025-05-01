@@ -488,7 +488,7 @@ const HomePage = () => {
     return (
         <LayoutPage>
             <div className="flex flex-col flex-1 py-4 px-4">
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-gray-300 shadow-md">
+                <div className="relative rounded-md overflow-hidden border border-gray-300 shadow-md">
                     {!loadCamera && (
                         <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-20">
                             <div className="text-center">
@@ -506,7 +506,7 @@ const HomePage = () => {
                     />
                     <canvas
                         ref={canvasRef}
-                        className={`absolute top-0 left-0 w-full h-full z-10 ${!loadCamera ? 'hidden' : ''}`}
+                        className={`absolute top-0 left-0 w-full h-full z-20 ${!loadCamera ? 'hidden' : ''}`}
                         width={1280}
                         height={720}
                     />
