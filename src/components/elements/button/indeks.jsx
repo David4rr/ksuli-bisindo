@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 
 const Button = (props) => {
-    const { children, classname = "bg-black", onClick = () => {}, type = "button" } = props;
+    const { children, className = "bg-black, text-white", onClick = () => {}, type = "button" } = props;
     return (
-        <button className={`h-10 px-6 font-semibold rounded-md ${classname} text-white`}
+        <button
+            className={`h-full px-6 font-semibold rounded-md ${className}`}
             type={type}
-            onClick={onClick}>
+            onClick={onClick}
+        >
             {children}
         </button>
     );
@@ -13,9 +15,9 @@ const Button = (props) => {
 
 Button.propTypes = {
     children: PropTypes.node.isRequired,
-    classname: PropTypes.string,
+    className: PropTypes.string, 
     onClick: PropTypes.func.isRequired,
     type: PropTypes.string
-}
+};
 
 export default Button;

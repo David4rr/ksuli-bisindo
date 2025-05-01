@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@fontsource/poppins": "^5.2.5",
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/holistic": "^0.5.1675471629",
+    "@tensorflow/tfjs": "^4.22.0",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.4.0"
