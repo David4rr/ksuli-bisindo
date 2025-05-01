@@ -503,8 +503,6 @@ const HomePage = () => {
                         autoPlay
                         playsInline
                         muted
-                        width={1280}
-                        height={720}
                     />
                     <canvas
                         ref={canvasRef}
