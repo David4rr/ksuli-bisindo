@@ -1,37 +1,33 @@
 import { useEffect, useState } from "react";
 import CardList from "../components/fragments/Card";
 import LayoutPage from "../components/layouts/layout";
-import { useRef } from "react";
 import cards from "../data/cards.json";
 
 const KosaKatapage = () => {
-    const [selectedCard, setSelectedCard] = useState(null); 
-    const pageTopRef = useRef(null);
+    const [selectedCard, setSelectedCard] = useState(null);
 
     useEffect(() => {
-        if (selectedCard && pageTopRef.current) {
-            const headerHeight = 200;
-            const elementPosition = pageTopRef.current.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: "smooth"
-            });
+        if (selectedCard) {
+            const element = document.getElementById("selectedCard");
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
         }
     }, [selectedCard]);
+
 
     return (
         <LayoutPage>
             <div className="flex flex-col py-4">
-                <h1 className="text-lg font-bold text-black">Kosa Kata</h1>
+                <h1
+                    id="selectedCard"
+                    className="text-lg font-bold text-black pt-2">Kosa Kata</h1>
                 <p className="text-black">
                     Halaman ini berisi kosa kata yang digunakan untuk deteksi
                 </p>
             </div>
             {selectedCard && (
                 <div
-                    ref={pageTopRef}
                     className="mb-8 p-4 border rounded shadow relative"
                 >
                     <button
@@ -81,7 +77,7 @@ const KosaKatapage = () => {
                     </div>
                 </div>
             )}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-center justify-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-center justify-center text-center">
                 {cards
                     .filter((card) => card.id !== (selectedCard?.id || null))
                     .map((card) => (
@@ -89,7 +85,7 @@ const KosaKatapage = () => {
                             key={card.id}
                             title={card.title}
                             image={card.image}
-                            onClick={() => setSelectedCard(card)} 
+                            onClick={() => setSelectedCard(card)}
                         />
                     ))}
             </div>
