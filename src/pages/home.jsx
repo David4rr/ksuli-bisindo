@@ -382,7 +382,7 @@ const HomePage = () => {
         animationRef.current = requestAnimationFrame(calculateFps);
     }, []);
 
-    const processResults = useCallback((keypoints) => {
+    const processResults = useCallback(async (keypoints) => {
         if (!keypoints) {
             setSentence(prev => prev === "Gerakan tidak dikenali" ? prev : "Gerakan tidak dikenali");
             return;
@@ -393,6 +393,7 @@ const HomePage = () => {
         predictionsRef.current = [...predictionsRef.current, keypoints].slice(-30);
 
         if (predictionsRef.current.length === 30) {
+            await tf.nextFrame();
             animationRef.current = requestAnimationFrame(() => {
                 const inputTensor = tf.tensor([predictionsRef.current]);
                 const prediction = modelRef.current.predict(inputTensor).dataSync();
@@ -499,7 +500,7 @@ const HomePage = () => {
                     )}
                     <video
                         ref={videoRef}
-                        className={`w-full h-full object-cover ${!loadCamera ? 'hidden' : ''}`}
+                        className={`w-full max-h-[80svh] object-cover ${!loadCamera ? 'hidden' : ''}`}
                         autoPlay
                         playsInline
                         muted
