@@ -313,6 +313,7 @@ import setupHolistic from "../utils/setupHolistic";
 import LayoutPage from "../components/layouts/layout";
 import { loadTensorFlowModel } from "../utils/tensorflowModelLoader";
 import actions from "../utils/result";
+import speakText from "../utils/textToSpeech";
 import * as tf from "@tensorflow/tfjs";
 
 const threshold = 0.9;
@@ -334,40 +335,6 @@ const HomePage = () => {
     const animationRef = useRef(null);
     const lastFpsUpdateRef = useRef(0);
     const frameCountRef = useRef(0);
-
-    const speakText = useCallback((text) => {
-        if (!('speechSynthesis' in window)) {
-            console.warn('Text-to-speech not supported in this browser');
-            return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance();
-
-        utterance.text = text;
-        utterance.lang = 'id-ID';
-        utterance.rate = 0.95;
-        utterance.pitch = 1.05;
-        utterance.volume = 1;
-
-        const getIndonesianVoice = () => {
-            const voices = window.speechSynthesis.getVoices();
-            return voices.find(voice => voice.lang === 'id-ID' || voice.lang.startsWith('id-'));
-        };
-
-        if (window.speechSynthesis.onvoiceschanged !== undefined) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                utterance.voice = getIndonesianVoice() || null;
-            };
-        } else {
-            utterance.voice = getIndonesianVoice() || null;
-        }
-
-        utterance.onerror = (event) => {
-            console.error('Speech synthesis error:', event.error);
-        };
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
-    }, []);
 
     const calculateFps = useCallback(() => {
         const now = performance.now();
@@ -421,7 +388,7 @@ const HomePage = () => {
                 }
             });
         }
-    }, [speakText]);
+    }, []);
 
     const startCameraAndHolistic = useCallback(async () => {
         const videoElement = videoRef.current;
@@ -488,7 +455,7 @@ const HomePage = () => {
 
     return (
         <LayoutPage>
-            <div className="flex flex-col flex-1 py-4 px-4">
+            <div className="flex flex-col flex-1 py-4">
                 <div className="relative lg:aspect-video rounded-md overflow-hidden border border-gray-300 shadow-md">
                     {!loadCamera && (
                         <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-20">
@@ -498,16 +465,18 @@ const HomePage = () => {
                             </div>
                         </div>
                     )}
+                    <canvas
+                        ref={canvasRef}
+                        className={`absolute top-0 left-0 w-full h-full z-20 ${!loadCamera ? 'hidden' : ''}`}
+                        width={1280}
+                        height={720}
+                    />
                     <video
                         ref={videoRef}
                         className={`w-full max-h-[80svh] object-cover ${!loadCamera ? 'hidden' : ''}`}
                         autoPlay
                         playsInline
                         muted
-                    />
-                    <canvas
-                        ref={canvasRef}
-                        className={`absolute top-0 left-0 w-full h-full z-20 ${!loadCamera ? 'hidden' : ''}`}
                         width={1280}
                         height={720}
                     />
