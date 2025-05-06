@@ -431,6 +431,7 @@ const HomePage = () => {
     }, [processResults, calculateFps]);
 
     useEffect(() => {
+
         startCameraAndHolistic();
 
         return () => {
@@ -477,8 +478,6 @@ const HomePage = () => {
                         autoPlay
                         playsInline
                         muted
-                        width={1280}
-                        height={720}
                     />
                 </div>
 

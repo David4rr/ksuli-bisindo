@@ -60,6 +60,13 @@ const setupHolistic = async (
       `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
   });
 
+  // globalThis.Module = {
+  //   arguments: [],
+  //   onRuntimeInitialized: () => {
+  //     console.log("WASM runtime initialized");
+  //   }
+  // }
+
   holistic.setOptions({
     modelComplexity: 1,
     smoothLandmarks: true,
@@ -113,9 +120,9 @@ const setupHolistic = async (
     const calculatedFps = Math.round(1000 / deltaTime);
     setFps(calculatedFps);
 
-    canvasCtx.fillStyle = "lime";
-    canvasCtx.font = "24px Arial";
-    canvasCtx.fillText(`FPS: ${calculatedFps}`, 10, 30);
+    // canvasCtx.fillStyle = "lime";
+    // canvasCtx.font = "24px Arial";
+    // canvasCtx.fillText(`FPS: ${calculatedFps}`, 10, 30);
 
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -199,16 +206,33 @@ const setupHolistic = async (
     }
 
     canvasCtx.restore();
-    // }
+    // // }
 
   });
 
   const camera = new Camera(videoElement, {
     onFrame: async () => {
+
+      if (videoElement.wideoWidth === 0 || videoElement.Height === 0) return;
+
+      const aspect = videoElement.videoWidth / videoElement.videoHeight;
+      let width, height;
+
+      if (window.innerWidth > window.innerHeight) {
+        height = window.innerHeight
+        width = height * aspect
+      } else {
+        width = window.innerWidth;
+        height = width / aspect;
+      }
+
+      canvasElement.width = width
+      canvasElement.height = height
+
       await holistic.send({ image: videoElement });
     },
-    width: 1280,
-    height: 720,
+    // width: 1280,
+    // height: 720,
   });
 
   await camera.start();
