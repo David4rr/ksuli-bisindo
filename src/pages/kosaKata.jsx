@@ -5,23 +5,32 @@ import cards from "../data/cards.json";
 
 const KosaKatapage = () => {
     const [selectedCard, setSelectedCard] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleClick = async (card) => {
+        setIsLoading(true);
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        setSelectedCard(card);
+        setIsLoading(false);
+    }
 
     useEffect(() => {
         if (selectedCard) {
             const element = document.getElementById("selectedCard");
             if (element) {
-                element.scrollIntoView({ behavior: "smooth", block: "start" });
+                element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
             }
         }
     }, [selectedCard]);
-
 
     return (
         <LayoutPage>
             <div className="flex flex-col py-4">
                 <h1
                     id="selectedCard"
-                    className="text-lg font-bold text-black pt-2 lg:pt-10">Kosa Kata</h1>
+                    className="text-lg font-bold text-black">Kosa Kata</h1>
                 <p className="text-black">
                     Halaman ini berisi kosa kata yang digunakan untuk deteksi
                 </p>
@@ -61,31 +70,55 @@ const KosaKatapage = () => {
                             </g>
                         </svg>
                     </button>
-                    <h1 className="text-xl font-bold text-primary">
-                        {selectedCard.title}
-                    </h1>
-                    <div className="flex flex-col md:flex-row lg:flex-row gap-4 lg:items-start mt-4">
-                        <img
-                            className="w-auto h-auto object-cover rounded-lg"
-                            src={selectedCard.image}
-                            alt={selectedCard.title}
-                        />
-                        <div className="flex flex-col">
-                            <h3 className="text-xl font-bold text-accent">Keterangan :</h3>
-                            <p className="mt-4 text-gray-700">{selectedCard.description}</p>
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
                         </div>
-                    </div>
+                    ) : (
+                        <>
+                            <h1 className="text-xl font-bold text-primary">
+                                {selectedCard.title}
+                            </h1>
+                            <div className="flex flex-col md:flex-row lg:flex-row gap-4 lg:items-start mt-4">
+                                {selectedCard.video ? (
+                                    <video
+                                        key={selectedCard.id}
+                                        className="w-[60svh] h-auto object-cover rounded-lg"
+                                        autoPlay
+                                        loop
+                                        muted
+                                        poster={selectedCard.poster}
+                                    >
+                                        <source src={selectedCard.video} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+
+                                ) : (
+                                    <img
+                                        key={selectedCard.id}
+                                        className="w-[60svh] h-auto object-cover rounded-lg"
+                                        src={selectedCard.poster}
+                                        alt={selectedCard.title}
+                                    />
+                                )}
+                                <div className="flex flex-col">
+                                    <h3 className="text-xl font-bold text-accent">Keterangan :</h3>
+                                    <p className=" text-gray-700">{selectedCard.description}</p>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             )}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-center justify-center text-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-center justify-center text-center mb-3">
                 {cards
                     .filter((card) => card.id !== (selectedCard?.id || null))
                     .map((card) => (
-                        <CardList
+                        <CardList 
                             key={card.id}
                             title={card.title}
-                            image={card.image}
-                            onClick={() => setSelectedCard(card)}
+                            image={card.poster}
+                            onClick={() => handleClick(card)}
                         />
                     ))}
             </div>

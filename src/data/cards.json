@@ -1,80 +1,72 @@
- [
-    {
-        "id": 1,
-        "title": "Apa",
-        "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-        "description": "Kedua tangan dari depan dada turun sampai sejajar siku."
-        },
-        {
-            "id": 2,
-            "title": "Bayar",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Tangan kanan dan kiri bersatu menggenggam sejajar dengan dada lalu tangan kanan membentuk huruf L."
-        },
-        {
-            "id": 3,
-            "title": "Berapa",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Kuuncupkan tangan kemudian buka satu persatu jari dari kelingking hingga ibu jari."
-        },
-        {
-            "id": 4,
-            "title": "Halo",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Angkat tangan di atas kepala dengan jari-jari terbuka dan disatukan membentuk lingkaran."
-        },
-        {
-            "id": 5,
-            "title": "Kembalian",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Telunjuk tangan kiri berada di depan telunjuk tangan kanan posisinya sejajar dengan dada lalu di gerakan memutar kebelakang."
-        },
-        {
-            "id": 6,
-            "title": "Lagi",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Ketiga jari tangan kanan diangkat kedepan dilambaikan dengan lembut."
-        },
-        {
-            "id": 7,
-            "title": "Mau",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Tangan kanan membentuk huruf U sejajar dengan bahu lalu diputar mengarah ke dada sebelah kiri."
-        },
-        {
-            "id": 8,
-            "title": "pesan",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Arahkan tangan kanan huruf T sibi pada dagu lalu tangan di ayunkan ke arah depan membentuk huruf L."
-        },
-        {
-            "id": 9,
-            "title": "Selamat Datang",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description":
-                "Tangan kanan menutup sejajar dengan dagu lalu mengarah kebawah, selanjutnya telunjuk tangan kanan mengarah ke atas sejajar dengan bahu lalu diarahkan kebawah sejajar dengan dada."
-        },
-        {
-            "id": 10,
-            "title": "Terima Kasih",
-            "image":
-                "https://i.pinimg.com/736x/bc/31/39/bc3139223d8b7ce90d9b1850310232c0.jpg",
-            "description": "Mengarahkan tangan kanan di dagu lalu lambaikan ke depan."
-        }
-    ]
+[
+  {
+    "id": 1,
+    "title": "Apa",
+    "poster": "/assets/images/kosaKata/apa.jpg",
+    "video": "/assets/videos/kosaKata/apa.mp4",
+    "description": "Kedua tangan dari depan dada turun sampai sejajar siku."
+  },
+  {
+    "id": 2,
+    "title": "Bayar",
+    "poster": "/assets/images/kosaKata/bayar.jpg",
+    "video": "/assets/videos/kosaKata/bayar.mp4",
+    "description": "Tangan kanan dan kiri bersatu menggenggam sejajar dengan dada lalu tangan kanan membentuk huruf L."
+  },
+  {
+    "id": 3,
+    "title": "Berapa",
+    "poster": "/assets/images/kosaKata/berapa.jpg",
+    "video": "/assets/videos/kosaKata/berapa.mp4",
+    "description": "Kuncupkan tangan kemudian buka satu persatu jari dari kelingking hingga ibu jari."
+  },
+  {
+    "id": 4,
+    "title": "Halo",
+    "poster": "/assets/images/kosaKata/halo.jpg",
+    "video": "/assets/videos/kosaKata/halo.mp4",
+    "description": "Angkat tangan di atas kepala dengan jari-jari terbuka dan disatukan membentuk lingkaran."
+  },
+  {
+    "id": 5,
+    "title": "Kembalian",
+    "poster": "/assets/images/kosaKata/kembalian.jpg",
+    "video": "/assets/videos/kosaKata/kembalian.mp4",
+    "description": "Telunjuk tangan kiri berada di depan telunjuk tangan kanan posisinya sejajar dengan dada lalu di gerakan memutar kebelakang."
+  },
+  {
+    "id": 6,
+    "title": "Lagi",
+    "poster": "/assets/images/kosaKata/lagi.jpg",
+    "video": "/assets/videos/kosaKata/lagi.mp4",
+    "description": "Ketiga jari tangan kanan diangkat kedepan dilambaikan dengan lembut."
+  },
+  {
+    "id": 7,
+    "title": "Mau",
+    "poster": "/assets/images/kosaKata/mau.jpg",
+    "video": "/assets/videos/kosaKata/mau.mp4",
+    "description": "Tangan kanan membentuk huruf U sejajar dengan bahu lalu diputar mengarah ke dada sebelah kiri."
+  },
+  {
+    "id": 8,
+    "title": "pesan",
+    "poster": "/assets/images/kosaKata/pesan.jpg",
+    "video": "/assets/videos/kosaKata/pesan.mp4",
+    "description": "Arahkan tangan kanan huruf T sibi pada dagu lalu tangan di ayunkan ke arah depan membentuk huruf L."
+  },
+  {
+    "id": 9,
+    "title": "Selamat Datang",
+    "poster": "/assets/images/kosaKata/selamatDatang.jpg",
+    "video": "/assets/videos/kosaKata/selamatDatang.mp4",
+    "description": "Tangan kanan menutup sejajar dengan dagu lalu mengarah kebawah, selanjutnya telunjuk tangan kanan mengarah ke atas sejajar dengan bahu lalu diarahkan kebawah sejajar dengan dada."
+  },
+  {
+    "id": 10,
+    "title": "Terima Kasih",
+    "poster": "/assets/images/kosaKata/terimaKasih.jpg",
+    "video": "/assets/videos/kosaKata/terimaKasih.mp4",
+    "description": "Mengarahkan tangan kanan di dagu lalu lambaikan ke depan."
+  }
+]
