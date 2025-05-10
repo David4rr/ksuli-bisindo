@@ -1,3 +1,4 @@
+import FooterPage from "../fragments/Footer";
 import NavbarLinks from "../fragments/Navbar";
 
 const LayoutPage = ({ children }) => {
@@ -7,6 +8,7 @@ const LayoutPage = ({ children }) => {
             <main className="flex flex-col flex-1 container max-w-[960px]">
                 {children}
             </main>
+            <FooterPage />
         </div>
     )
 }
