@@ -12,7 +12,7 @@ const CardList = ({ title, image, onClick }) => {
       </div>
       <figure>
         <img
-          className="w-full h-full object-cover"
+          className="w-full h-[25svh] object-cover"
           src={image}
           alt={title}
         />
