@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Home from '../pages/home';
-import Testing2 from '../pages/testing2';
 import KosaKatapage from '../pages/kosaKata';
+import Testing from '../pages/testing';
 
 const router = createBrowserRouter([
     {
@@ -12,10 +12,11 @@ const router = createBrowserRouter([
         path: '/kosakata',
         element: <KosaKatapage />
     },
-    {
-        path: '/testing2',
-        element: <Testing2 />
-    }
+    //* route ini hanya digunakan untuk pengembangan
+    // {
+    //     path: '/testing',
+    //     element: <Testing />
+    // }
 ])
 
 export default router;
