@@ -1,313 +1,3 @@
-// import React, { useEffect, useRef, useState } from "react";
-// // import { useNavigate } from "react-router-dom";
-// import LayoutPage from "../components/layouts/layout";
-// // import Button from "../../../learning-react2/src/Components/Elements/Button";
-
-// const HomePage = () => {
-//     const [loadCamera, setLoadCamera] = useState(false);
-//     const videoRef = useRef(null);
-
-//     useEffect(() => {
-//         let stream;
-
-//         const startWebcam = async () => {
-//             try {
-//                 stream = await navigator.mediaDevices.getUserMedia({
-//                     video: true,
-//                 });
-
-//                 if (videoRef.current) {
-//                     videoRef.current.srcObject = stream;
-//                 }
-//             } catch (error) {
-//                 console.error("Error accessing webcam:", error);
-//             }
-//         };
-
-//         startWebcam();
-//         setLoadCamera(true);
-
-//         // Cleanup function to stop the camera
-//         return () => {
-//             if (stream) {
-//                 stream.getTracks().forEach((track) => track.stop());
-//             }
-//             setLoadCamera(false);
-//         };
-//     }, []);
-
-//     return (
-//         <LayoutPage>
-//             <div className="flex flex-col flex-1 py-4">
-//                 {loadCamera ? (
-//                     <div className="rounded-md overflow-hidden relative">
-//                         <video
-//                             ref={videoRef}
-//                             className="w-full max-h-[80svh] object-cover"
-//                             autoPlay
-//                             playsInline
-//                             muted />
-//                     </div>
-//                 ) : (
-//                     <div className="flex flex-col items-center justify-center flex-1">
-//                         <div className="loader"></div>
-//                         <p className="mt-4 text-lg text-gray-700">Loading...</p>
-//                     </div>
-//                 )}
-//             </div>
-//         </LayoutPage>
-//     );
-// };
-
-// export default HomePage;
-
-//! ini code backup
-// import React, { useRef, useState, useEffect, useCallback } from "react";
-// import setupHolistic from "../utils/setupHolistic";
-// import LayoutPage from "../components/layouts/layout";
-// import { loadTensorFlowModel } from "../utils/tensorflowModelLoader";
-// import actions from "../utils/result";
-// import * as tf from "@tensorflow/tfjs";
-
-// const threshold = 0.9;
-
-// const HomePage = () => {
-//     const [loadCamera, setLoadCamera] = useState(false);
-//     const [fps, setFps] = useState(0);
-//     const [sentence, setSentence] = useState("");
-//     const [probabilities, setProbabilities] = useState([]);
-
-//     const modelRef = useRef(null);
-//     const videoRef = useRef(null);
-//     const canvasRef = useRef(null);
-//     const holisticRef = useRef(null);
-//     const cameraRef = useRef(null);
-//     const predictionsRef = useRef([]);
-//     const predictionHistoryRef = useRef([]);
-//     const lastSpokenRef = useRef("");
-//     const animationRef = useRef(null);
-//     const lastFpsUpdateRef = useRef(0);
-//     const frameCountRef = useRef(0);
-
-//     //   const speakText = useCallback((text) => {
-//     //     const utterance = new SpeechSynthesisUtterance(text);
-//     //     utterance.lang = "id-ID";
-//     //     window.speechSynthesis.speak(utterance);
-//     //   }, []);
-
-//     const speakText = useCallback((text) => {
-//         if (!('speechSynthesis' in window)) {
-//             console.warn('Text-to-speech not supported in this browser');
-//             return;
-//         }
-
-//         const utterance = new SpeechSynthesisUtterance();
-
-//         utterance.text = text;
-//         utterance.lang = 'id-ID';
-//         utterance.rate = 0.95;
-//         utterance.pitch = 1.05;
-//         utterance.volume = 1;
-
-//         const getIndonesianVoice = () => {
-//             const voices = window.speechSynthesis.getVoices();
-//             return voices.find(voice => voice.lang === 'id-ID' || voice.lang.startsWith('id-'));
-//         };
-
-//         if (window.speechSynthesis.onvoiceschanged !== undefined) {
-//             window.speechSynthesis.onvoiceschanged = () => {
-//                 utterance.voice = getIndonesianVoice() || null;
-//             };
-//         } else {
-//             utterance.voice = getIndonesianVoice() || null;
-//         }
-
-//         utterance.onerror = (event) => {
-//             console.error('Speech synthesis error:', event.error);
-//         };
-//         window.speechSynthesis.cancel();
-//         window.speechSynthesis.speak(utterance);
-//     }, []);
-
-//     const calculateFps = useCallback(() => {
-//         const now = performance.now();
-//         frameCountRef.current++;
-
-//         if (now >= lastFpsUpdateRef.current + 1000) {
-//             setFps(Math.round((frameCountRef.current * 1000) / (now - lastFpsUpdateRef.current)));
-//             lastFpsUpdateRef.current = now;
-//             frameCountRef.current = 0;
-//         }
-
-//         animationRef.current = requestAnimationFrame(calculateFps);
-//     }, []);
-
-//     const processResults = useCallback((keypoints) => {
-//         if (!keypoints) {
-//             setSentence(prev => prev === "Gerakan tidak dikenali" ? prev : "Gerakan tidak dikenali");
-//             return;
-//         }
-
-//         if (!modelRef.current) return;
-
-//         // Store last 30 frames
-//         predictionsRef.current = [...predictionsRef.current, keypoints].slice(-30);
-
-//         if (predictionsRef.current.length === 30) {
-//             // Use requestAnimationFrame for prediction to avoid blocking UI
-//             animationRef.current = requestAnimationFrame(() => {
-//                 const inputTensor = tf.tensor([predictionsRef.current]);
-//                 const prediction = modelRef.current.predict(inputTensor).dataSync();
-//                 inputTensor.dispose();
-
-//                 setProbabilities([...prediction]);
-
-//                 const maxIndex = prediction.indexOf(Math.max(...prediction));
-//                 const confidence = prediction[maxIndex];
-//                 const currentPrediction = maxIndex;
-
-//                 // Store last 10 predictions for confirmation
-//                 predictionHistoryRef.current = [...predictionHistoryRef.current, currentPrediction].slice(-10);
-
-//                 // Check if we have consistent predictions
-//                 const uniquePredictions = [...new Set(predictionHistoryRef.current)];
-//                 const isConsistentPrediction = uniquePredictions.length === 1;
-
-//                 if (isConsistentPrediction && confidence > threshold) {
-//                     const predictedWord = actions[currentPrediction];
-
-//                     if (predictedWord !== lastSpokenRef.current) {
-//                         lastSpokenRef.current = predictedWord;
-//                         setSentence(predictedWord);
-//                         speakText(predictedWord);
-//                     }
-//                 }
-//             });
-//         }
-//     }, [speakText]);
-
-//     const startCameraAndHolistic = useCallback(async () => {
-//         const videoElement = videoRef.current;
-//         const canvasElement = canvasRef.current;
-
-//         if (!videoElement || !canvasElement) {
-//             console.warn("Video or canvas not ready yet");
-//             return;
-//         }
-
-//         if (!modelRef.current) {
-//             try {
-//                 modelRef.current = await loadTensorFlowModel();
-//             } catch (error) {
-//                 console.error("Gagal memuat model:", error);
-//                 return;
-//             }
-//         }
-
-//         const { holistic, camera } = await setupHolistic(
-//             videoElement,
-//             canvasElement,
-//             setFps,
-//             processResults
-//         );
-
-//         holisticRef.current = holistic;
-//         cameraRef.current = camera;
-//         setLoadCamera(true);
-//         calculateFps();
-
-//         console.log("Kamera dimulai");
-//     }, [processResults, calculateFps]);
-
-//     useEffect(() => {
-//         // if (!loadCamera) {
-//             startCameraAndHolistic();
-//         // }
-
-//         return () => {
-//             // cameraRef.current?.stop?.();
-//             // holisticRef.current?.close?.();
-//             // cancelAnimationFrame(animationRef.current);
-//             // window.speechSynthesis.cancel(); 
-//             // console.log("Kamera dihentikan dan holistic ditutup");
-
-//             if (cameraRef.current) {
-//                 cameraRef.current.stop();
-//                 console.log("Kamera dihentikan");
-//             }
-
-//             if (holisticRef.current) {
-//                 holisticRef.current.close();
-//                 console.log("Holistic ditutup");
-//             }
-
-//             if (animationRef.current) {
-//                 cancelAnimationFrame(animationRef.current);
-//             }
-
-//             window.speechSynthesis.cancel();
-//             console.log("Resources dibersihkan saat pindah halaman");
-//         };
-
-//     }, [startCameraAndHolistic]);
-
-//     return (
-//         <LayoutPage>
-//             <div className="flex flex-col flex-1 py-4 px-4">
-//                 <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-gray-300 shadow-md">
-//                     <video
-//                         ref={videoRef}
-//                         className="w-full h-full object-cover"
-//                         autoPlay
-//                         playsInline
-//                         muted
-//                         width={1280}
-//                         height={720}
-//                     />
-//                     <canvas
-//                         ref={canvasRef}
-//                         className="absolute top-0 left-0 w-full h-full z-10"
-//                         width={1280}
-//                         height={720}
-//                     />
-//                 </div>
-
-//                 <h2 className="text-sm text-black font-semibold mb-2 mt-4">FPS: {fps}</h2>
-
-//                 <div className="text-lg font-bold text-start text-black">
-//                     Hasil Prediksi: {sentence}
-//                 </div>
-
-//                 <div className="mt-4">
-//                     {sentence !== "Gerakan tidak dikenali" &&
-//                         Array.isArray(probabilities) &&
-//                         probabilities.map((prob, index) => {
-//                             if (prob < 0.1) return null;
-//                             const label = actions[index] || `Label ${index}`;
-//                             return (
-//                                 <div key={index} className="mb-2">
-//                                     <div className="flex items-center justify-between">
-//                                         <span className="text-lg font-medium text-black">{label}</span>
-//                                         <div className="w-1/2 bg-blue-100 rounded-full h-6 relative overflow-hidden">
-//                                             <div
-//                                                 className="bg-primary h-6 rounded-full text-white text-sm font-semibold flex items-center justify-center transition-all duration-300"
-//                                                 style={{ width: `${prob * 100}%` }}
-//                                             >
-//                                                 {(prob * 100).toFixed(2)}%
-//                                             </div>
-//                                         </div>
-//                                     </div>
-//                                 </div>
-//                             );
-//                         })}
-//                 </div>
-//             </div>
-//         </LayoutPage>
-//     );
-// };
-
-// export default HomePage;
-
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import setupHolistic from "../utils/setupHolistic";
 import LayoutPage from "../components/layouts/layout";
@@ -320,6 +10,8 @@ const threshold = 0.9;
 
 const HomePage = () => {
     const [loadCamera, setLoadCamera] = useState(false);
+    const [cameraError, setCameraError] = useState(null);
+    const [showAlert, setShowAlert] = useState(true);
     const [fps, setFps] = useState(0);
     const [sentence, setSentence] = useState("");
     const [probabilities, setProbabilities] = useState([]);
@@ -350,12 +42,12 @@ const HomePage = () => {
     }, []);
 
     const processResults = useCallback(async (keypoints) => {
+        if (!modelRef.current) return;
+
         if (!keypoints) {
             setSentence(prev => prev === "Gerakan tidak dikenali" ? prev : "Gerakan tidak dikenali");
             return;
         }
-
-        if (!modelRef.current) return;
 
         predictionsRef.current = [...predictionsRef.current, keypoints].slice(-30);
 
@@ -391,26 +83,31 @@ const HomePage = () => {
     }, []);
 
     const startCameraAndHolistic = useCallback(async () => {
+        setCameraError(null);
+        setLoadCamera(false);
+
+        if (!navigator.mediaDevices?.getUserMedia) {
+            setCameraError("unsupported")
+            return;
+        }
+
         const videoElement = videoRef.current;
         const canvasElement = canvasRef.current;
 
         if (!videoElement || !canvasElement) {
             console.warn("Video or canvas not ready yet");
+            setCameraError("generic");
             return;
         }
 
-        if (!modelRef.current) {
-            try {
-                modelRef.current = await loadTensorFlowModel();
-            } catch (error) {
-                console.error("Gagal memuat model:", error);
-                return;
-            }
-        }
-
-        setLoadCamera(false); // Show loading when starting camera setup
-
         try {
+
+            if (!modelRef.current) {
+                modelRef.current = await loadTensorFlowModel();
+            }
+
+            await navigator.mediaDevices.getUserMedia({ video: true })
+
             const { holistic, camera } = await setupHolistic(
                 videoElement,
                 canvasElement,
@@ -420,12 +117,22 @@ const HomePage = () => {
 
             holisticRef.current = holistic;
             cameraRef.current = camera;
-            setLoadCamera(true); // Hide loading when setup is complete
+            setLoadCamera(true); 
             calculateFps();
-
             console.log("Kamera dimulai");
+
         } catch (error) {
             console.error("Gagal memulai kamera:", error);
+
+            if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+                setCameraError("permission");
+            } else if (error.message?.includes("holistic")) {
+                setCameraError("holistic");
+            } else if (error.message?.includes("model")) {
+                setCameraError("model");
+            } else {
+                setCameraError("generic");
+            }
             setLoadCamera(false);
         }
     }, [processResults, calculateFps]);
@@ -457,12 +164,90 @@ const HomePage = () => {
     return (
         <LayoutPage>
             <div className="flex flex-col flex-1 py-4">
-                <div className="relative aspect-auto rounded-md overflow-hidden border border-gray-300 shadow-md">
+                {showAlert && (
+                    <div role="alert" className="alert alert-vertical sm:alert-horizontal bg-neutral border-transparent my-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-warning h-6 w-6 shrink-0">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span className="text-gray-600 text-xl">Pencahayaan ideal 120 - 250 lux, jarak ideal 1 meter dari kamera dengan posisi setengah badan</span>
+                        <div>
+                            <button className="btn btn-outline border-secondary text-secondary hover:bg-secondary hover:text-white" onClick={() => setShowAlert(false)}>Tutup</button>
+                        </div>
+                    </div>
+                )}
+                <div className="relative aspect-auto md:min-h-[40svh] sm:min-h-[40svh] lg:min-h-[50svh] rounded-md overflow-hidden border border-gray-300 shadow-md">
                     {!loadCamera && (
                         <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-20">
-                            <div className="text-center">
-                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-2"></div>
-                                <p className="text-black font-medium">Memuat kamera...</p>
+                            <div className="text-center px-4">
+                                {cameraError === "permission" ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <h3 className="text-lg font-bold mb-2 text-warning">Akses Kamera Dibutuhkan</h3>
+                                        <div className="text-sm text-gray-600 mb-4">
+                                            <p className="mb-2">Untuk menggunakan aplikasi ini:</p>
+                                            <ol className="list-decimal list-inside space-y-1 text-left">
+                                                <li>Klik ikon kamera di address bar browser Anda</li>
+                                                <li>Pilih "Izinkan" atau "Allow" untuk akses kamera</li>
+                                                <li>Setelah mengizinkan, klik tombol di bawah</li>
+                                            </ol>
+                                        </div>
+                                        <button
+                                            onClick={startCameraAndHolistic}
+                                            className="btn btn-warning gap-2"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                                            </svg>
+                                            Izinkan Kamera
+                                        </button>
+                                    </>
+                                ) : cameraError === "holistic" ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p className="text-black font-medium mb-4">Gagal menginisialisasi sistem pengenalan gerakan</p>
+                                        <button
+                                            onClick={startCameraAndHolistic}
+                                            className="btn btn-error gap-2"
+                                        >
+                                            Coba Lagi
+                                        </button>
+                                    </>
+                                ) : cameraError === "model" ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p className="text-black font-medium mb-4">Gagal memuat model AI. Periksa koneksi internet Anda</p>
+                                        <button
+                                            onClick={startCameraAndHolistic}
+                                            className="btn btn-error gap-2"
+                                        >
+                                            Muat Ulang
+                                        </button>
+                                    </>
+                                ) : cameraError === "generic" ? (
+                                    <>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <p className="text-black font-medium mb-4">Terjadi kesalahan saat mengakses kamera</p>
+                                        <button
+                                            onClick={startCameraAndHolistic}
+                                            className="btn btn-error gap-2"
+                                        >
+                                            Coba Lagi
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-2"></div>
+                                        <p className="text-black font-medium">Memuat sistem...</p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
