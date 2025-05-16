@@ -23,6 +23,17 @@ const KosaKatapage = () => {
                 element.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
             }
         }
+
+        const handleData = () => {
+            if (document.visibilityState === "visible") {
+                setSelectedCard(null);
+            }
+        };
+        document.addEventListener('visibilitychange', handleData);
+        return () => {
+            document.removeEventListener('visibilitychange', handleData);
+        };
+
     }, [selectedCard]);
 
     return (
