@@ -25,8 +25,11 @@ const KosaKatapage = () => {
         }
 
         const handleData = () => {
-            if (document.visibilityState === "visible") {
-                setSelectedCard(null);
+            if (document.visibilityState === "visible" && selectedCard) {
+                const videoElement = document.querySelector(`video[key="${selectedCard.id}"]`);
+                if (videoElement) {
+                    videoElement.load();
+                }
             }
         };
         document.addEventListener('visibilitychange', handleData);
