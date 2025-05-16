@@ -169,7 +169,7 @@ const HomePage = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-warning h-6 w-6 shrink-0">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span className="text-gray-600 text-xl">Pencahayaan ideal 120 - 250 lux, jarak ideal 1 meter dari kamera dengan posisi setengah badan</span>
+                        <span className="text-gray-600 text-xl">Pencahayaan ideal 120 - 250 lux, jarak ideal 1 meter dari kamera dengan posisi setengah badan. Tunggu hingga muncul indikator landmark, lalu angkat salah satu tangan untuk memulai deteksi.</span>
                         <div>
                             <button className="btn btn-outline border-secondary text-secondary hover:bg-secondary hover:text-white" onClick={() => setShowAlert(false)}>Tutup</button>
                         </div>
