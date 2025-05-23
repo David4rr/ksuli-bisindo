@@ -1,34 +1,27 @@
-export const speakText = (text) => {
-    if (!('speechSynthesis' in window)){
-        console.warn('Speech Synthesis not supported in this browser.');
-        return;
+export default function speakText(text) {
+
+    const audioMap = {
+        "Halo": "halo.mp3",
+        "Selamat datang": "selamat-datang.mp3",
+        "Mau": "mau.mp3",
+        "Pesan": "pesan.mp3",
+        "Bayar": "bayar.mp3",
+        "Kembalian": "kembalian.mp3",
+        "Lagi": "lagi.mp3",
+        "Terima kasih": "terima-kasih.mp3",
+        "Apa": "apa.mp3", 
+        "Berapa": "berapa.mp3",
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.text = text;
-    utterance.lang = 'id-ID';
-    utterance.rate = 0.95;
-    utterance.pitch = 1.05;
-
-    const getIndonesianVoice = () => {
-        const voices = window.speechSynthesis.getVoices();
-        return voices.find(voice => voice.lang === 'id-ID' || voice.lang.startsWith('id-'));
-    };
-
-    if (window.speechSynthesis.onvoiceschanged){
-        window.speechSynthesis.onvoiceschanged = () => {
-            utterance.voice = getIndonesianVoice() || null;
-        }
-    } else {
-        utterance.voice = getIndonesianVoice() || null;
+    const audioFile = audioMap[text];
+    if (!audioFile) {
+        console.error(`File suara untuk "${text}" tidak ditemukan.`)
+        return
     }
 
-    utterance.onerror = (error) => {
-        console.error('Speech synthesis error:', error);
-    }
+    const audio = new Audio(`/assets/suara/${audioFile}`);
+    audio.play().catch(error => {
+        console.error("Gagal memutar suara:", error)
+    })
 
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
 }
-
-export default speakText;

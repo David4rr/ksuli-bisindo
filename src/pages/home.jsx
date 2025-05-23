@@ -3,8 +3,8 @@ import setupHolistic from "../utils/setupHolistic";
 import LayoutPage from "../components/layouts/layout";
 import { loadTensorFlowModel } from "../utils/tensorflowModelLoader";
 import actions from "../utils/result";
-import speakText from "../utils/textToSpeech";
 import * as tf from "@tensorflow/tfjs";
+import speakText from "../utils/textToSpeech";
 
 const threshold = 0.9;
 
@@ -117,7 +117,7 @@ const HomePage = () => {
 
             holisticRef.current = holistic;
             cameraRef.current = camera;
-            setLoadCamera(true); 
+            setLoadCamera(true);
             calculateFps();
             console.log("Kamera dimulai");
 
@@ -156,7 +156,6 @@ const HomePage = () => {
                 cancelAnimationFrame(animationRef.current);
             }
 
-            window.speechSynthesis.cancel();
             console.log("Resources dibersihkan saat pindah halaman");
         };
     }, [startCameraAndHolistic]);

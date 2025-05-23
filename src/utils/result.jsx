@@ -1,14 +1,14 @@
 const actions = [
-    "halo",
-    "selamatDatang",
-    "mau",
-    "pesan",
-    "bayar",
-    "kembalian",
-    "lagi",
-    "terimaKasih",
-    "apa",
-    "berapa"
+    "Halo",
+    "Selamat datang",
+    "Mau",
+    "Pesan",
+    "Bayar",
+    "Kembalian",
+    "Lagi",
+    "Terima kasih",
+    "Apa",
+    "Berapa"
 ];
 
 export default actions;
