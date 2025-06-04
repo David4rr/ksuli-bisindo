@@ -15,6 +15,7 @@ const HomePage = () => {
     const [fps, setFps] = useState(0);
     const [sentence, setSentence] = useState("");
     const [probabilities, setProbabilities] = useState([]);
+    const [distance, setDistance] = useState(null);
 
     const modelRef = useRef(null);
     const videoRef = useRef(null);
@@ -27,6 +28,8 @@ const HomePage = () => {
     const animationRef = useRef(null);
     const lastFpsUpdateRef = useRef(0);
     const frameCountRef = useRef(0);
+    const distanceHistoryRef = useRef([]);
+    const handsFrameRef = useRef(0);
 
     const calculateFps = useCallback(() => {
         const now = performance.now();
@@ -41,13 +44,60 @@ const HomePage = () => {
         animationRef.current = requestAnimationFrame(calculateFps);
     }, []);
 
-    const processResults = useCallback(async (keypoints) => {
+    const calculateDistance = useCallback((faceWidthPx) => {
+        const SAMPLE = [122.6, 121.5, 123.0, 124.5];
+        const KNOWN_FACE_WIDTH = 14.3; // cm
+        const KNOWN_DISTANCE = 150; // cm //tadi 120cm
+        const MEDIAN_SAMPLE = getMedian(SAMPLE);
+        const FOCAL_LENGTH = (MEDIAN_SAMPLE * KNOWN_DISTANCE) / KNOWN_FACE_WIDTH;
+
+        if (faceWidthPx === 0) return 0;
+        return (KNOWN_FACE_WIDTH * FOCAL_LENGTH) / faceWidthPx;
+    }, []);
+
+    const getMedian = (arr) => {
+        const sortedArr = arr.slice().sort((a, b) => a - b);
+        const mid = Math.floor(sortedArr.length / 2);
+        return sortedArr.length % 2 !== 0 ? sortedArr[mid] : (sortedArr[mid - 1] + sortedArr[mid]) / 2;
+    };
+
+    const getFaceWidth = (faceLandmarks, frameWidth) => {
+        if (!faceLandmarks || !faceLandmarks[234] || !faceLandmarks[454]) return 0;
+
+        const leftFace = faceLandmarks[234].x * frameWidth;
+        const rightFace = faceLandmarks[454].x * frameWidth;
+
+        return Math.abs(rightFace - leftFace);
+    };
+
+    const processResults = useCallback(async (keypoints, results) => {
         if (!modelRef.current) return;
 
-        if (!keypoints) {
-            setSentence(prev => prev === "Gerakan tidak dikenali" ? prev : "Gerakan tidak dikenali");
+        // Distance measurement
+        if (results.faceLandmarks) {
+            const faceWidthPx = getFaceWidth(results.faceLandmarks, canvasRef.current.width);
+            const currentDistance = calculateDistance(faceWidthPx);
+
+            // Smooth distance values
+            distanceHistoryRef.current = [...distanceHistoryRef.current, currentDistance].slice(-5);
+            const smoothDistance = distanceHistoryRef.current.reduce((a, b) => a + b, 0) / distanceHistoryRef.current.length;
+
+            setDistance(Math.round(smoothDistance));
+        }
+
+        if (keypoints === null) {
+            handsFrameRef.current += 1;
+
+            // Tunggu 5 frame baru set "tidak dikenali"
+            if (handsFrameRef.current >= 15) {
+                setSentence(prev => prev === "Gerakan tidak dikenali" ? prev : "Gerakan tidak dikenali");
+                predictionHistoryRef.current = []; // Reset history
+            }
             return;
         }
+
+        // 3. Reset counter jika tangan terdeteksi
+        handsFrameRef.current = 0;
 
         predictionsRef.current = [...predictionsRef.current, keypoints].slice(-30);
 
@@ -80,7 +130,7 @@ const HomePage = () => {
                 }
             });
         }
-    }, []);
+    }, [calculateDistance]);
 
     const startCameraAndHolistic = useCallback(async () => {
         setCameraError(null);
@@ -112,7 +162,8 @@ const HomePage = () => {
                 videoElement,
                 canvasElement,
                 setFps,
-                processResults
+                // processResults
+                (keypoints, results) => processResults(keypoints, results)
             );
 
             holisticRef.current = holistic;
@@ -160,6 +211,35 @@ const HomePage = () => {
         };
     }, [startCameraAndHolistic]);
 
+    // Function to render distance badge
+    const renderDistanceBadge = () => {
+        if (distance === null) return null;
+
+        let badgeClass = "";
+        let badgeText = "";
+
+        if (distance < 80) {
+            badgeClass = "badge-error";
+            badgeText = "Jarak terlalu dekat";
+        } else if (distance >= 80 && distance <= 100) {
+            badgeClass = "badge-success";
+            badgeText = "Jarak optimal";
+        } else {
+            badgeClass = "badge-warning";
+            badgeText = "Jarak terlalu jauh";
+        }
+
+        return (
+            <div className={`badge text-sm font-semibold ${badgeClass}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {badgeText} ({distance} cm)
+            </div>
+        );
+    };
+
     return (
         <LayoutPage>
             <div className="flex flex-col flex-1 py-4">
@@ -168,7 +248,7 @@ const HomePage = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-warning h-6 w-6 shrink-0">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                        <span className="text-gray-600 text-xl">Pencahayaan ideal 120 - 250 lux, jarak ideal 1 meter dari kamera dengan posisi setengah badan. Tunggu hingga muncul indikator landmark, lalu angkat salah satu tangan untuk memulai deteksi.</span>
+                        <span className="text-gray-600 text-xl">Pastikan pencahayaan mencukupi, jarak ideal 1 meter dari kamera dengan posisi setengah badan. Tunggu hingga muncul indikator landmark, lalu angkat salah satu tangan untuk memulai deteksi.</span>
                         <div>
                             <button className="btn btn-outline border-secondary text-secondary hover:bg-secondary hover:text-white" onClick={() => setShowAlert(false)}>Tutup</button>
                         </div>
@@ -267,8 +347,10 @@ const HomePage = () => {
 
                 {loadCamera ? (
                     <>
-                        <h2 className="text-sm text-black font-semibold mb-2 mt-4">FPS: {fps}</h2>
-
+                        <div className="flex w-auto mb-2 mt-4 gap-2">
+                            <div className="badge badge-soft text-sm font-semibold ">FPS: {fps}</div>
+                            {renderDistanceBadge()}
+                        </div>
                         <div className="text-lg font-bold text-start text-black">
                             Hasil Prediksi: {sentence}
                         </div>

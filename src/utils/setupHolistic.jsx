@@ -50,7 +50,6 @@ const setupHolistic = async (
   canvasElement,
   setFps,
   onKeypointsExtracted
-  // getShowLandmarks
 ) => {
   const canvasCtx = canvasElement.getContext("2d");
   const lastTime = { current: Date.now() };
@@ -87,11 +86,11 @@ const setupHolistic = async (
         // Ekstrak keypoints dan lakukan prediksi
         const keypoints = extractKeypoints(results);
         if (typeof onKeypointsExtracted === 'function') {
-          onKeypointsExtracted(keypoints);
+          onKeypointsExtracted(keypoints, results);
         }
       } else {
         if (typeof onKeypointsExtracted === 'function') {
-          onKeypointsExtracted(null);
+          onKeypointsExtracted(null, results);
         }
       }
     } catch (error) {
@@ -206,7 +205,6 @@ const setupHolistic = async (
     }
 
     canvasCtx.restore();
-    // // }
 
   });
 
