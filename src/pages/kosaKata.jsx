@@ -24,19 +24,6 @@ const KosaKatapage = () => {
             }
         }
 
-        const handleData = () => {
-            if (document.visibilityState === "visible" && selectedCard) {
-                const videoElement = document.querySelector(`video[key="${selectedCard.id}"]`);
-                if (videoElement) {
-                    videoElement.load();
-                }
-            }
-        };
-        document.addEventListener('visibilitychange', handleData);
-        return () => {
-            document.removeEventListener('visibilitychange', handleData);
-        };
-
     }, [selectedCard]);
 
     return (
@@ -128,7 +115,7 @@ const KosaKatapage = () => {
                 {cards
                     .filter((card) => card.id !== (selectedCard?.id || null))
                     .map((card) => (
-                        <CardList 
+                        <CardList
                             key={card.id}
                             title={card.title}
                             image={card.poster}

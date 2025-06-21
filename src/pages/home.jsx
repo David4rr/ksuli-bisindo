@@ -5,6 +5,7 @@ import { loadTensorFlowModel } from "../utils/tensorflowModelLoader";
 import actions from "../utils/result";
 import * as tf from "@tensorflow/tfjs";
 import speakText from "../utils/textToSpeech";
+import CameraErrorOverlay from "../components/layouts/errorMesages";
 
 const threshold = 0.9;
 
@@ -47,7 +48,7 @@ const HomePage = () => {
     const calculateDistance = useCallback((faceWidthPx) => {
         const SAMPLE = [122.6, 121.5, 123.0, 124.5];
         const KNOWN_FACE_WIDTH = 14.3; // cm
-        const KNOWN_DISTANCE = 150; // cm //tadi 120cm
+        const KNOWN_DISTANCE = 160; // cm //tadi 120cm
         const MEDIAN_SAMPLE = getMedian(SAMPLE);
         const FOCAL_LENGTH = (MEDIAN_SAMPLE * KNOWN_DISTANCE) / KNOWN_FACE_WIDTH;
 
@@ -162,7 +163,6 @@ const HomePage = () => {
                 videoElement,
                 canvasElement,
                 setFps,
-                // processResults
                 (keypoints, results) => processResults(keypoints, results)
             );
 
@@ -256,79 +256,7 @@ const HomePage = () => {
                 )}
                 <div className="relative aspect-auto md:min-h-[40svh] sm:min-h-[40svh] lg:min-h-[50svh] rounded-md overflow-hidden border border-gray-300 shadow-md">
                     {!loadCamera && (
-                        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-20">
-                            <div className="text-center px-4">
-                                {cameraError === "permission" ? (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
-                                        <h3 className="text-lg font-bold mb-2 text-warning">Akses Kamera Dibutuhkan</h3>
-                                        <div className="text-sm text-gray-600 mb-4">
-                                            <p className="mb-2">Untuk menggunakan aplikasi ini:</p>
-                                            <ol className="list-decimal list-inside space-y-1 text-left">
-                                                <li>Klik ikon kamera di address bar browser Anda</li>
-                                                <li>Pilih "Izinkan" atau "Allow" untuk akses kamera</li>
-                                                <li>Setelah mengizinkan, klik tombol di bawah</li>
-                                            </ol>
-                                        </div>
-                                        <button
-                                            onClick={startCameraAndHolistic}
-                                            className="btn btn-warning gap-2"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
-                                            </svg>
-                                            Izinkan Kamera
-                                        </button>
-                                    </>
-                                ) : cameraError === "holistic" ? (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <p className="text-black font-medium mb-4">Gagal menginisialisasi sistem pengenalan gerakan</p>
-                                        <button
-                                            onClick={startCameraAndHolistic}
-                                            className="btn btn-error gap-2"
-                                        >
-                                            Coba Lagi
-                                        </button>
-                                    </>
-                                ) : cameraError === "model" ? (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <p className="text-black font-medium mb-4">Gagal memuat model AI. Periksa koneksi internet Anda</p>
-                                        <button
-                                            onClick={startCameraAndHolistic}
-                                            className="btn btn-error gap-2"
-                                        >
-                                            Muat Ulang
-                                        </button>
-                                    </>
-                                ) : cameraError === "generic" ? (
-                                    <>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <p className="text-black font-medium mb-4">Terjadi kesalahan saat mengakses kamera</p>
-                                        <button
-                                            onClick={startCameraAndHolistic}
-                                            className="btn btn-error gap-2"
-                                        >
-                                            Coba Lagi
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-2"></div>
-                                        <p className="text-black font-medium">Memuat sistem...</p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
+                        <CameraErrorOverlay errorType={cameraError} onRetry={startCameraAndHolistic} loading={!cameraError} />
                     )}
                     <canvas
                         ref={canvasRef}
